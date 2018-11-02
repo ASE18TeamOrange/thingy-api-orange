@@ -8,7 +8,7 @@ from datetime import datetime
 MQTT_BROKER_ADDR = 'mqtt://orange:164e089363@mqtt.thing.zone:1898'
 
 # Thingy services and characteristics
-THNGY_NAME = '4N0NsTlEBB0NBInNwPPq6w' # TODO: find a way to update this variable with the current thingy id
+THNGY_NAME = 'wCTz0UmwOe5gKM17m5d_Fg' # TODO: find a way to update this variable with the current thingy id
 
 # Thingy configuration service
 THNGY_CONFIG_UUID = 'ef680100-9b35-4933-9b10-52ffa9740042'
@@ -45,6 +45,7 @@ def temp_coro():
             date = str(datetime.now())
 
             print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
+
             data = {
                 'temperature': temperature,
                 'date': date
@@ -56,6 +57,7 @@ def temp_coro():
 
     except ClientException as ce:
         print(ce)
+
     hund = redis.getList('temperature_series', 0, 3)
     print(hund)
     redis.delete('temperature_series')
@@ -110,6 +112,6 @@ def humidity_coro():
 
 if __name__ == '__main__':
     # Testing of different services
-    # asyncio.get_event_loop().run_until_complete(temp_coro())
+    asyncio.get_event_loop().run_until_complete(temp_coro())
     # asyncio.get_event_loop().run_until_complete(pressure_coro())
     # asyncio.get_event_loop().run_until_complete(humidity_coro())
