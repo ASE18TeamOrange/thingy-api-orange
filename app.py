@@ -4,8 +4,13 @@ from models import *
 
 
 def app_factory(args=()):
-    database.create_tables()
+    # database.create_tables()
     app = web.Application()
     setup_routes(app)
-    return app
+    web.run_app(app)
 
+# Run the server
+try:
+    app_factory()
+except KeyboardInterrupt:
+    pass
