@@ -1,7 +1,17 @@
+aiohttp==3.4.4
+aiohttp-cors==0.7.0
+async-timeout==3.0.0
+attrs==18.2.0
+chardet==3.0.4
 docopt==0.6.2
 hbmqtt==0.9.4
+idna==2.7
+idna-ssl==1.1.0
+multidict==4.4.1
 passlib==1.7.1
 PyYAML==3.13
+redis==2.10.6
 six==1.11.0
 transitions==0.6.9
 websockets==6.0
+yarl==1.2.6
