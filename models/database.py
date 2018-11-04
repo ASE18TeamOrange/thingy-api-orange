@@ -20,5 +20,8 @@ class Database:
     def getList(self, key, start, end):
         return self.__connection.lrange(key, start, end)
 
+    def getListLength(self, key):
+        return self.__connection.llen(key)
+
     def delete(self, key):
         self.__connection.delete(key)

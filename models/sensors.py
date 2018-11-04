@@ -1,22 +1,31 @@
+from ast import literal_eval
+import json
+from models.database import Database
 class Temperature():
+# Store temperature readings
+    
+    # database connection handle
+    redis = Database()
 
-  # Store temperature readings
-  # TODO: Replace dummy data with sensor readings
-  readings = {
-  1:21.0,
-  2:20.3,
-  3:20.1,
-  4:20.9
-  }
+    @classmethod
+    async def all_readings(cls):
+        """Get a list of all recorded temps"""
 
-  @classmethod
-  async def all_readings(cls):
-    """Get a list of all recorded temps"""
-    return cls.readings
+        readings = cls.redis.getList('temperature_series', 0, cls.redis.getListLength('temperature_series'))
+        readings_json = []
+        for item in readings:
+            item_json = literal_eval(item.decode('utf8'))
+            readings_json.append(item_json)
 
-  @classmethod
-  async def last_reading(cls):
-    """Get a list of all recorded temps"""
-    return cls.readings[max(cls.readings.keys())]
+        return readings_json
 
-# TODO: define and implement rest of functions for Temperature object
+    @classmethod
+    async def last_reading(cls):
+        """Get the most recent temp recording"""
+
+        # Get last reading from list
+        readings = cls.redis.getList('temperature_series', 0, cls.redis.getListLength('temperature_series'))
+        most_recent_reading = readings[-1]
+        reading_json = literal_eval(most_recent_reading.decode('utf8'))
+
+        return reading_json
