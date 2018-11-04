@@ -1,5 +1,7 @@
 import aiohttp_cors
 import views
+import controllers.user
+import controllers.temperature
 
 
 def setup_routes(app):
@@ -18,3 +20,13 @@ def setup_routes(app):
     # cors.add(temp_resource.add_route("POST", create_todo))
     last_temp_resource = cors.add(app.router.add_resource("/temperature/last", name='last_temperature'))
     cors.add(last_temp_resource.add_route("GET", views.LastTempView))
+
+    add_user_resource = cors.add(app.router.add_resource("/user/", name='add_user'))
+    cors.add(add_user_resource.add_route("POST", controllers.user.create_user))
+    delete_user_resource = cors.add(app.router.add_resource("/user/", name='delete_user'))
+    cors.add(delete_user_resource.add_route("DELETE", controllers.user.delete_user))
+
+    get_user_temperatures = cors.add(app.router.add_resource("/temperatures/", name='temperatures'))
+    cors.add(get_user_temperatures.add_route("GET", controllers.temperature.collect_temperatures))
+
+

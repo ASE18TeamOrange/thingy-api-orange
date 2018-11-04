@@ -27,15 +27,13 @@ THNGY_USR_INTERF_LED_UUID = 'ef680301-9b35-4933-9b10-52ffa9740042'
 THNGY_USR_INTERF_BUTTON_UUID = 'ef680302-9b35-4933-9b10-52ffa9740042'
 
 @asyncio.coroutine
-def temp_coro():
+def temp_coro(database, key):
     try:
         C = MQTTClient()
         yield from C.connect(MQTT_BROKER_ADDR)
         yield from C.subscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_TMP_UUID), QOS_1)])
 
         # yield from C.subscribe([('#', QOS_1)])
-
-        redis = Database()
 
         for i in range(1, 10):
             message = yield from C.deliver_message()
@@ -51,7 +49,8 @@ def temp_coro():
                 'temperature': temperature,
                 'date': date
             }
-            redis.enqueue('temperature_series', data)
+
+            database.enqueue(key, data)
 
         yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_TMP_UUID))])
         yield from C.disconnect()
@@ -59,13 +58,13 @@ def temp_coro():
     except ClientException as ce:
         print(ce)
 
-    hund = redis.getList('temperature_series', 0, 3)
-    print(hund)
-    redis.delete('temperature_series')
+    #hund = redis.getList('temperature_series', 0, 3)
+    #print(hund)
+    #redis.delete('temperature_series')
 
 
 @asyncio.coroutine
-def pressure_coro():
+def pressure_coro(database, key):
     try:
         C = MQTTClient()
         yield from C.connect(MQTT_BROKER_ADDR)
@@ -90,7 +89,7 @@ def pressure_coro():
 
 
 @asyncio.coroutine
-def humidity_coro():
+def humidity_coro(database, key):
     try:
         C = MQTTClient()
         yield from C.connect(MQTT_BROKER_ADDR)
@@ -145,7 +144,7 @@ def get_thingy_name():
         print("%s => %s" % (packet.variable_header.topic_name, response.data.decode("ascii")))
         yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_CONFIG_UUID, THNGY_CONFIG_NAME_UUID))])
         yield from C.disconnect()
-    except ConnectException as ce:
+    except ClientException as ce:
         pass
 
 
@@ -160,13 +159,13 @@ def get_led_vals_coro():
         print(list(response.data))
         yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_USR_INTERF_UUID, THNGY_USR_INTERF_LED_UUID))])
         yield from C.disconnect()
-    except ConnectException as ce:
+    except ClientException as ce:
         pass
 
 
 
 
-if __name__ == '__main__':
+#if __name__ == '__main__':
     # Logging
     # formatter = "[%(asctime)s] %(name)s {%(filename)s:%(lineno)d} %(levelname)s - %(message)s"
     # logging.basicConfig(level=logging.DEBUG, format=formatter)

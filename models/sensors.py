@@ -3,7 +3,7 @@ import json
 from models.database import Database
 class Temperature():
 # Store temperature readings
-    
+
     # database connection handle
     redis = Database()
 
