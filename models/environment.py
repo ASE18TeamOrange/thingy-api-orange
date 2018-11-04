@@ -6,36 +6,44 @@ class EnvironmentSensorData:
     __pressure = "pressure"
     __humidity = "humidity"
 
+    __database = None
+
+    def __init__(self):
+        self.__database = Database()
+
     def __get_key(self, name, measure):
         return name + '#' + measure
 
+    #todo we need to have a strategy: overwrite or not if key present??. Currently it will overwrite
     async def temperatures(self, name):
-        redis = Database()
-        key = self.__get_key(name, self.__temp)
+        key = 'temperature_series' #self.__get_key(name, self.__temp)
         if not self.exists(key):
-            redis.insert(key)
-            return key
-        return None
+            self.__database.insert(key)
+        return key
+
 
     async def pressures(self, name):
-        redis = Database()
         key = self.__get_key(name, self.__pressure)
         if not self.exists(key):
-            redis.insert(key)
-            return key
-        return None
+            self.__database.insert(key)
+        return key
+
 
     async def humidities(self, name):
-        redis = Database()
         key = self.__get_key(name, self.__humidity)
         if not self.exists(key):
-            redis.insert(key)
-            return key
-        return None
+            self.__database.insert(key)
+        return key
+
 
     async def exists(self, key):
-        redis = Database()
-        user = redis.get(key)
-        if user is not None:
+        series = self.__database.get(key)
+        if series is not None:
+            return True
+        return False
+
+    async def delete(self, key):
+        if self.exists(key):
+            self.__database.delete(key)
             return True
         return False

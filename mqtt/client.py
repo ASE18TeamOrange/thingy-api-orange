@@ -9,7 +9,7 @@ import logging
 MQTT_BROKER_ADDR = 'mqtt://orange:164e089363@mqtt.thing.zone:1898'
 
 # Thingy services and characteristics
-THNGY_NAME = 'zEXsm7vCifllS6qABgH5Lw' # TODO: find a way to update this variable with the current thingy id
+THNGY_NAME = 'wCTz0UmwOe5gKM17m5d_Fg' # TODO: find a way to update this variable with the current thingy id
 
 # Thingy configuration service
 THNGY_CONFIG_UUID = 'ef680100-9b35-4933-9b10-52ffa9740042'

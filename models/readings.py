@@ -1,6 +1,8 @@
 from ast import literal_eval
 import json
 from models.database import Database
+
+
 class Temperature():
 # Store temperature readings
 

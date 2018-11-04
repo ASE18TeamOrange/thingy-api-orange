@@ -2,7 +2,7 @@ from aiohttp import web
 from service.thingy_env_sensors import EnvironmentSensorDataService
 
 
-async def collect_humidities(request):
+async def log_humidities(request):
     data = await request.json()
 
     if 'name' not in data:
@@ -12,6 +12,6 @@ async def collect_humidities(request):
         return web.json_response({'error': '"name" must be a string with at least one character'})
 
     humidity_service = EnvironmentSensorDataService()
-    humidity_service.run_humidity_service()
+    humidity_service.run_humidity_service(name)
 
     return web.Response(status=204)

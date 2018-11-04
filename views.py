@@ -1,7 +1,7 @@
 from aiohttp.web import Response, View, json_response
 from aiohttp_cors import CorsViewMixin
 
-from models.sensors import Temperature
+from models.readings import Temperature
 
 
 class TempsView(View, CorsViewMixin):

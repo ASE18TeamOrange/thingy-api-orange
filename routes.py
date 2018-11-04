@@ -13,8 +13,10 @@ def setup_routes(app):
             allow_headers="*",
         )
     })
+
     temp_resource = cors.add(app.router.add_resource("/temperature/", name='temperature'))
     cors.add(temp_resource.add_route("GET", views.TempsView))
+
     # TODO: Add more resources and routes
     # cors.add(temp_resource.add_route("DELETE", remove_all_todos))
     # cors.add(temp_resource.add_route("POST", create_todo))
@@ -26,7 +28,7 @@ def setup_routes(app):
     delete_user_resource = cors.add(app.router.add_resource("/user/", name='delete_user'))
     cors.add(delete_user_resource.add_route("DELETE", controllers.user.delete_user))
 
-    get_user_temperatures = cors.add(app.router.add_resource("/temperatures/", name='temperatures'))
-    cors.add(get_user_temperatures.add_route("GET", controllers.temperature.collect_temperatures))
+    get_user_temperatures = cors.add(app.router.add_resource("/log_temperatures/", name='temperatures'))
+    cors.add(get_user_temperatures.add_route("GET", controllers.temperature.log_temperatures))
 
 
