@@ -13,7 +13,7 @@ async def log_temperatures(request):
     #    return web.json_response({'error': '"name" must be a string with at least one character'})
 
     #temp
-    name = 'jack'
+    name = 'temperature_series'
     temperature_service = EnvironmentSensorDataService()
     temperature_service.run_temperature_service(name)
 

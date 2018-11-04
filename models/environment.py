@@ -15,34 +15,34 @@ class EnvironmentSensorData:
         return name + '#' + measure
 
     #todo we need to have a strategy: overwrite or not if key present??. Currently it will overwrite
-    async def temperatures(self, name):
+    def temperatures(self, name):
         key = 'temperature_series' #self.__get_key(name, self.__temp)
-        if not self.exists(key):
-            self.__database.insert(key)
+        #if not self.exists(key):
+        #    self.__database.insert(key)
         return key
 
 
-    async def pressures(self, name):
+    def pressures(self, name):
         key = self.__get_key(name, self.__pressure)
         if not self.exists(key):
             self.__database.insert(key)
         return key
 
 
-    async def humidities(self, name):
+    def humidities(self, name):
         key = self.__get_key(name, self.__humidity)
         if not self.exists(key):
             self.__database.insert(key)
         return key
 
 
-    async def exists(self, key):
+    def exists(self, key):
         series = self.__database.get(key)
         if series is not None:
             return True
         return False
 
-    async def delete(self, key):
+    def delete(self, key):
         if self.exists(key):
             self.__database.delete(key)
             return True

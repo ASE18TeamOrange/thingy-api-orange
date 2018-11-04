@@ -27,7 +27,8 @@ THNGY_USR_INTERF_LED_UUID = 'ef680301-9b35-4933-9b10-52ffa9740042'
 THNGY_USR_INTERF_BUTTON_UUID = 'ef680302-9b35-4933-9b10-52ffa9740042'
 
 @asyncio.coroutine
-def temp_coro(database, key):
+def temp_coro(databasre, key):
+    database = Database()
     try:
         C = MQTTClient()
         yield from C.connect(MQTT_BROKER_ADDR)
@@ -50,6 +51,7 @@ def temp_coro(database, key):
                 'date': date
             }
 
+            database = Database()
             database.enqueue(key, data)
 
         yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_TMP_UUID))])
@@ -58,10 +60,8 @@ def temp_coro(database, key):
     except ClientException as ce:
         print(ce)
 
-    #hund = redis.getList('temperature_series', 0, 3)
-    #print(hund)
-    #redis.delete('temperature_series')
-
+    hund = database.getList('temperature_series', 0, 3)
+    print(hund)
 
 @asyncio.coroutine
 def pressure_coro(database, key):
