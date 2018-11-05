@@ -17,10 +17,13 @@ class Database:
     def get(self, key):
         return self.__connection.get(key)
 
-    def getList(self, key, start, end):
+    def exists(self, key):
+        return self.__connection.exists(key)
+
+    def get_list(self, key, start, end):
         return self.__connection.lrange(key, start, end)
 
-    def getListLength(self, key):
+    def get_list_length(self, key):
         return self.__connection.llen(key)
 
     def delete(self, key):

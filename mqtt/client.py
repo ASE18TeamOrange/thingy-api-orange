@@ -5,174 +5,175 @@ from hbmqtt.mqtt.constants import QOS_0, QOS_1, QOS_2
 from datetime import datetime
 import logging
 
-# Connection parameters
-MQTT_BROKER_ADDR = 'mqtt://orange:164e089363@mqtt.thing.zone:1898'
 
-# Thingy services and characteristics
-THNGY_NAME = 'wCTz0UmwOe5gKM17m5d_Fg' # TODO: find a way to update this variable with the current thingy id
+class MqttClient:
+    # Connection parameters
+    MQTT_BROKER_ADDR = 'mqtt://orange:164e089363@mqtt.thing.zone:1898'
 
-# Thingy configuration service
-THNGY_CONFIG_UUID = 'ef680100-9b35-4933-9b10-52ffa9740042'
-THNGY_CONFIG_NAME_UUID = 'ef680101-9b35-4933-9b10-52ffa9740042'
+    # Thingy services and characteristics
+    THNGY_NAME = '3rmfSzjVcyWknuTicTfnJA'  # TODO: find a way to update this variable with the current thingy id
 
-# Thingy environment service
-THNGY_ENV_UUID = 'ef680200-9b35-4933-9b10-52ffa9740042'
-THNGY_ENV_TMP_UUID = 'ef680201-9b35-4933-9b10-52ffa9740042'
-THNGY_ENV_PRESS_UUID = 'ef680202-9b35-4933-9b10-52ffa9740042'
-THNGY_ENV_HUMID_UUID = 'ef680203-9b35-4933-9b10-52ffa9740042'
+    # Thingy configuration service
+    THNGY_CONFIG_UUID = 'ef680100-9b35-4933-9b10-52ffa9740042'
+    THNGY_CONFIG_NAME_UUID = 'ef680101-9b35-4933-9b10-52ffa9740042'
 
-# Thingy user interface service
-THNGY_USR_INTERF_UUID = 'ef680300-9b35-4933-9b10-52ffa9740042'
-THNGY_USR_INTERF_LED_UUID = 'ef680301-9b35-4933-9b10-52ffa9740042'
-THNGY_USR_INTERF_BUTTON_UUID = 'ef680302-9b35-4933-9b10-52ffa9740042'
+    # Thingy environment service
+    THNGY_ENV_UUID = 'ef680200-9b35-4933-9b10-52ffa9740042'
+    THNGY_ENV_TMP_UUID = 'ef680201-9b35-4933-9b10-52ffa9740042'
+    THNGY_ENV_PRESS_UUID = 'ef680202-9b35-4933-9b10-52ffa9740042'
+    THNGY_ENV_HUMID_UUID = 'ef680203-9b35-4933-9b10-52ffa9740042'
 
-@asyncio.coroutine
-def temp_coro(database, key):
-    #database = Database()
-    try:
-        C = MQTTClient()
-        yield from C.connect(MQTT_BROKER_ADDR)
-        yield from C.subscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_TMP_UUID), QOS_1)])
+    # Thingy user interface service
+    THNGY_USR_INTERF_UUID = 'ef680300-9b35-4933-9b10-52ffa9740042'
+    THNGY_USR_INTERF_LED_UUID = 'ef680301-9b35-4933-9b10-52ffa9740042'
+    THNGY_USR_INTERF_BUTTON_UUID = 'ef680302-9b35-4933-9b10-52ffa9740042'
 
-        # yield from C.subscribe([('#', QOS_1)])
+    @asyncio.coroutine
+    def temp_coro(self, database, key):
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_TMP_UUID), QOS_1)])
 
-        for i in range(1, 10):
-            message = yield from C.deliver_message()
-            packet = message.publish_packet
-            integer = packet.payload.data[0]
-            decimal = packet.payload.data[1]
-            temperature = integer + (decimal / 100)
-            date = str(datetime.now())
+            # yield from C.subscribe([('#', QOS_1)])
 
-            print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
+            for i in range(1, 5):
+                message = yield from C.deliver_message()
+                packet = message.publish_packet
+                integer = packet.payload.data[0]
+                decimal = packet.payload.data[1]
+                temperature = integer + (decimal / 100)
+                date = str(datetime.now())
 
-            data = {
-                'temperature': temperature,
-                'date': date
-            }
+                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
 
-            database.enqueue(key, data)
+                data = {
+                    'temperature': temperature,
+                    'date': date
+                }
 
-        yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_TMP_UUID))])
-        yield from C.disconnect()
+                database.enqueue(key, data)
 
-    except ClientException as ce:
-        print(ce)
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_TMP_UUID))])
+            yield from C.disconnect()
 
-    hund = database.getList('temperature_series', 0, 3)
-    print(hund)
+        except ClientException as ce:
+            print(ce)
 
-@asyncio.coroutine
-def pressure_coro(database, key):
-    try:
-        C = MQTTClient()
-        yield from C.connect(MQTT_BROKER_ADDR)
-        yield from C.subscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_PRESS_UUID), QOS_1)])
+        hund = database.get_list('temperature_series', 0, 3)
+        print(hund)
 
-        # yield from C.subscribe([('#', QOS_1)])
+    @asyncio.coroutine
+    def pressure_coro(self, database, key):
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_PRESS_UUID), QOS_1)])
 
-        for i in range(1, 10):
-            message = yield from C.deliver_message()
-            packet = message.publish_packet
-            # TODO: check the parsing of pressure data - it seems like wrong values (~180 instead of ~1000)
-            integer = packet.payload.data[0]
-            decimal = packet.payload.data[4]
-            temperature = integer + (decimal / 100)
+            # yield from C.subscribe([('#', QOS_1)])
 
-            print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
+            for i in range(1, 10):
+                message = yield from C.deliver_message()
+                packet = message.publish_packet
+                # TODO: check the parsing of pressure data - it seems like wrong values (~180 instead of ~1000)
+                integer = packet.payload.data[0]
+                decimal = packet.payload.data[4]
+                temperature = integer + (decimal / 100)
 
-        yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_PRESS_UUID))])
-        yield from C.disconnect()
-    except ClientException as ce:
-        print(ce)
+                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
 
-
-@asyncio.coroutine
-def humidity_coro(database, key):
-    try:
-        C = MQTTClient()
-        yield from C.connect(MQTT_BROKER_ADDR)
-        yield from C.subscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_HUMID_UUID), QOS_1)])
-
-        # yield from C.subscribe([('#', QOS_1)])
-
-        for i in range(1, 10):
-            message = yield from C.deliver_message()
-            packet = message.publish_packet
-            humidity = packet.payload.data[0]
-
-            print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(humidity)))
-
-        yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_ENV_UUID, THNGY_ENV_HUMID_UUID))])
-        yield from C.disconnect()
-    except ClientException as ce:
-        print(ce)
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_PRESS_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            print(ce)
 
 
-@asyncio.coroutine
-def button_coro():
-    try:
-        C = MQTTClient()
-        yield from C.connect(MQTT_BROKER_ADDR)
-        yield from C.subscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_USR_INTERF_UUID, THNGY_USR_INTERF_BUTTON_UUID), QOS_1)])
+    @asyncio.coroutine
+    def humidity_coro(self, database, key):
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_HUMID_UUID), QOS_1)])
 
-        for i in range(10):
-            message = yield from C.deliver_message()
-            packet = message.publish_packet
-            if packet.payload.data:
-                print("Button pressed")
-            else:
-                print("Button not pressed")
+            # yield from C.subscribe([('#', QOS_1)])
 
-        yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_USR_INTERF_UUID, THNGY_USR_INTERF_BUTTON_UUID))])
-        yield from C.disconnect()
-    except ClientException as ce:
-        print(ce)
+            for i in range(1, 10):
+                message = yield from C.deliver_message()
+                packet = message.publish_packet
+                humidity = packet.payload.data[0]
 
+                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(humidity)))
 
-@asyncio.coroutine
-def get_thingy_name():
-    try:
-        C = MQTTClient()
-        yield from C.connect(MQTT_BROKER_ADDR)
-        yield from C.subscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_CONFIG_UUID, THNGY_CONFIG_NAME_UUID), QOS_1)])
-        message = yield from C.publish('%s/%s/%s/read' % (THNGY_NAME, THNGY_CONFIG_UUID, THNGY_CONFIG_NAME_UUID), b'read', qos=QOS_1)
-        response = yield from C.deliver_message()
-        packet = response.publish_packet
-
-        print("%s => %s" % (packet.variable_header.topic_name, response.data.decode("ascii")))
-        yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_CONFIG_UUID, THNGY_CONFIG_NAME_UUID))])
-        yield from C.disconnect()
-    except ClientException as ce:
-        pass
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_HUMID_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            print(ce)
 
 
-@asyncio.coroutine
-def get_led_vals_coro():
-    try:
-        C = MQTTClient()
-        yield from C.connect(MQTT_BROKER_ADDR)
-        yield from C.subscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_USR_INTERF_UUID, THNGY_USR_INTERF_LED_UUID), QOS_1)])
-        message = yield from C.publish('%s/%s/%s/read' % (THNGY_NAME, THNGY_USR_INTERF_UUID, THNGY_USR_INTERF_LED_UUID), b'read', qos=QOS_1)
-        response = yield from C.deliver_message()
-        print(list(response.data))
-        yield from C.unsubscribe([('%s/%s/%s' % (THNGY_NAME, THNGY_USR_INTERF_UUID, THNGY_USR_INTERF_LED_UUID))])
-        yield from C.disconnect()
-    except ClientException as ce:
-        pass
+    @asyncio.coroutine
+    def button_coro(self):
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_USR_INTERF_UUID, self.THNGY_USR_INTERF_BUTTON_UUID), QOS_1)])
+
+            for i in range(10):
+                message = yield from C.deliver_message()
+                packet = message.publish_packet
+                if packet.payload.data:
+                    print("Button pressed")
+                else:
+                    print("Button not pressed")
+
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_USR_INTERF_UUID, self.THNGY_USR_INTERF_BUTTON_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            print(ce)
+
+
+    @asyncio.coroutine
+    def get_thingy_name(self):
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_CONFIG_UUID, self.THNGY_CONFIG_NAME_UUID), QOS_1)])
+            message = yield from C.publish('%s/%s/%s/read' % (self.THNGY_NAME, self.THNGY_CONFIG_UUID, self.THNGY_CONFIG_NAME_UUID), b'read', qos=QOS_1)
+            response = yield from C.deliver_message()
+            packet = response.publish_packet
+
+            print("%s => %s" % (packet.variable_header.topic_name, response.data.decode("ascii")))
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_CONFIG_UUID, self.THNGY_CONFIG_NAME_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            pass
+
+
+    @asyncio.coroutine
+    def get_led_vals_coro(self):
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_USR_INTERF_UUID, self.THNGY_USR_INTERF_LED_UUID), QOS_1)])
+            message = yield from C.publish('%s/%s/%s/read' % (self.THNGY_NAME, self.THNGY_USR_INTERF_UUID, self.THNGY_USR_INTERF_LED_UUID), b'read', qos=QOS_1)
+            response = yield from C.deliver_message()
+            print(list(response.data))
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_USR_INTERF_UUID, self.THNGY_USR_INTERF_LED_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            pass
 
 
 
 
-#if __name__ == '__main__':
-    # Logging
-    # formatter = "[%(asctime)s] %(name)s {%(filename)s:%(lineno)d} %(levelname)s - %(message)s"
-    # logging.basicConfig(level=logging.DEBUG, format=formatter)
-    
-    # Testing of different services
-    # asyncio.get_event_loop().run_until_complete(get_thingy_name())
-    # asyncio.get_event_loop().run_until_complete(get_led_vals_coro())
-    # asyncio.get_event_loop().run_until_complete(temp_coro())
-    # asyncio.get_event_loop().run_until_complete(button_coro())
-    # asyncio.get_event_loop().run_until_complete(pressure_coro())
-    # asyncio.get_event_loop().run_until_complete(humidity_coro())
+    #if __name__ == '__main__':
+        # Logging
+        # formatter = "[%(asctime)s] %(name)s {%(filename)s:%(lineno)d} %(levelname)s - %(message)s"
+        # logging.basicConfig(level=logging.DEBUG, format=formatter)
+
+        # Testing of different services
+        # asyncio.get_event_loop().run_until_complete(get_thingy_name())
+        # asyncio.get_event_loop().run_until_complete(get_led_vals_coro())
+        # asyncio.get_event_loop().run_until_complete(temp_coro())
+        # asyncio.get_event_loop().run_until_complete(button_coro())
+        # asyncio.get_event_loop().run_until_complete(pressure_coro())
+        # asyncio.get_event_loop().run_until_complete(humidity_coro())

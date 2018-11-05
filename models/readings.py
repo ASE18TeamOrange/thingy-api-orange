@@ -3,7 +3,7 @@ import json
 from models.database import Database
 
 
-class Temperature():
+class Temperature:
 # Store temperature readings
 
     # database connection handle
@@ -13,7 +13,7 @@ class Temperature():
     async def all_readings(cls):
         """Get a list of all recorded temps"""
 
-        readings = cls.redis.getList('temperature_series', 0, cls.redis.getListLength('temperature_series'))
+        readings = cls.redis.get_list('temperature_series', 0, cls.redis.get_list_length('temperature_series'))
         readings_json = []
         for item in readings:
             item_json = literal_eval(item.decode('utf8'))
@@ -26,7 +26,7 @@ class Temperature():
         """Get the most recent temp recording"""
 
         # Get last reading from list
-        readings = cls.redis.getList('temperature_series', 0, cls.redis.getListLength('temperature_series'))
+        readings = cls.redis.get_list('temperature_series', 0, cls.redis.get_list_length('temperature_series'))
         most_recent_reading = readings[-1]
         reading_json = literal_eval(most_recent_reading.decode('utf8'))
 

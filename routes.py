@@ -28,7 +28,9 @@ def setup_routes(app):
     delete_user_resource = cors.add(app.router.add_resource("/user/", name='delete_user'))
     cors.add(delete_user_resource.add_route("DELETE", controllers.user.delete_user))
 
-    get_user_temperatures = cors.add(app.router.add_resource("/log_temperatures/", name='temperatures'))
+    get_user_temperatures = cors.add(app.router.add_resource("/log_temperatures/", name='log_temperatures'))
     cors.add(get_user_temperatures.add_route("GET", controllers.temperature.log_temperatures))
+    delete_user_temperatures = cors.add(app.router.add_resource("/log_temperatures/", name='delete_temperatures'))
+    cors.add(delete_user_temperatures.add_route("DELETE", controllers.temperature.delete_temperature_log))
 
 
