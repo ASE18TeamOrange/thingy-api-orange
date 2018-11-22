@@ -34,3 +34,8 @@ class EnvironmentSensorDataService:
         key = self.__esd.gases(name)
         if key is not None:
             asyncio.ensure_future(self.__mqtt_client.gas_coro(self.__database, key))
+    
+    def run_light_service(self, name):
+        key = self.__esd.lights(name)
+        if key is not None:
+            asyncio.ensure_future(self.__mqtt_client.light_coro(self.__database, key))

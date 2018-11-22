@@ -7,6 +7,7 @@ class EnvironmentSensorData:
     __pressure = "pressure_series"
     __humidity = "humidity_series"
     __gas = "gas_series"
+    __light = "light_series"
 
     __database = None
 
@@ -44,6 +45,13 @@ class EnvironmentSensorData:
 
     def gases(self, name):
         key = 'gas_series'
+        # key = self.__get_key(name, self.__gas)
+        # if not self.exists(key):
+        #     self.__database.insert(key, [])
+        return key
+    
+    def lights(self, name):
+        key = 'light_series'
         # key = self.__get_key(name, self.__gas)
         # if not self.exists(key):
         #     self.__database.insert(key, [])

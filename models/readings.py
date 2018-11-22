@@ -92,6 +92,7 @@ class Humidity:
 
         return reading_json
 
+
 class Gas:
 # Store gas readings
 
@@ -116,6 +117,36 @@ class Gas:
 
         # Get last reading from list
         readings = cls.redis.get_list('gas_series', 0, cls.redis.get_list_length('gas_series'))
+        most_recent_reading = readings[-1]
+        reading_json = literal_eval(most_recent_reading.decode('utf8'))
+
+        return reading_json
+
+
+class Light:
+# Store light readings
+
+    # database connection handle
+    redis = Database()
+
+    @classmethod
+    async def all_readings(cls):
+        """Get a list of all recorded light"""
+
+        readings = cls.redis.get_list('light_series', 0, cls.redis.get_list_length('light_series'))
+        readings_json = []
+        for item in readings:
+            item_json = literal_eval(item.decode('utf8'))
+            readings_json.append(item_json)
+
+        return readings_json
+
+    @classmethod
+    async def last_reading(cls):
+        """Get the most recent light recording"""
+
+        # Get last reading from list
+        readings = cls.redis.get_list('light_series', 0, cls.redis.get_list_length('light_series'))
         most_recent_reading = readings[-1]
         reading_json = literal_eval(most_recent_reading.decode('utf8'))
 

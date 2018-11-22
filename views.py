@@ -1,7 +1,7 @@
 from aiohttp.web import Response, View, json_response
 from aiohttp_cors import CorsViewMixin
 
-from models.readings import Temperature, Pressure, Humidity, Gas
+from models.readings import Temperature, Pressure, Humidity, Gas, Light
 
 
 class TempsView(View, CorsViewMixin):
@@ -80,3 +80,22 @@ class LastGasView(View, CorsViewMixin):
     async def get(self):
       """ Return JSON with the current gas reading """
       return json_response(await Gas.last_reading())
+
+
+class LightView(View, CorsViewMixin):
+    """
+    Light view
+    """
+
+    async def get(self):
+      """ Return JSON with all light readings """
+      return json_response(await Light.all_readings())
+
+class LastLightView(View, CorsViewMixin):
+    """
+    Last light view (most recent reading)
+    """
+
+    async def get(self):
+      """ Return JSON with the current light reading """
+      return json_response(await Light.last_reading())

@@ -23,6 +23,7 @@ class MqttClient:
     THNGY_ENV_PRESS_UUID = 'ef680202-9b35-4933-9b10-52ffa9740042'
     THNGY_ENV_HUMID_UUID = 'ef680203-9b35-4933-9b10-52ffa9740042'
     THNGY_ENV_GAS_UUID = 'ef680204-9b35-4933-9b10-52ffa9740042'
+    THNGY_ENV_LIGHT_UUID = 'ef680205-9b35-4933-9b10-52ffa9740042'
 
     # Thingy user interface service
     THNGY_USR_INTERF_UUID = 'ef680300-9b35-4933-9b10-52ffa9740042'
@@ -79,7 +80,7 @@ class MqttClient:
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 # TODO: check the parsing of pressure data - it seems like wrong values (~180 instead of ~1000)
-                
+
                 integer = packet.payload.data[0]
                 decimal = packet.payload.data[4]
                 pressure = integer + (decimal / 100.0)
@@ -169,6 +170,44 @@ class MqttClient:
             print("Error while running coroutine: ", ce)
         
         readings = database.get_list('gas_series', 0, database.get_list_length('gas_series'))
+        for read in readings:
+            print("IM BAKK ", read)
+
+    @asyncio.coroutine
+    def light_coro(self, database, key):
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_LIGHT_UUID), QOS_1)])
+
+            # yield from C.subscribe([('#', QOS_1)])
+
+            for i in range(1, 10):
+                message = yield from C.deliver_message()
+                packet = message.publish_packet
+                color = {
+                'red':  packet.payload.data[0],
+                'green': packet.payload.data[2],
+                'blue': packet.payload.data[4],
+                'clear': packet.payload.data[6]
+                }
+                date = str(datetime.now())
+
+                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(color)))
+
+                data = {
+                    'color': color,
+                    'date': date
+                }
+                print(data)
+                database.enqueue(key, data)
+
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_LIGHT_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            print("Error while running coroutine: ", ce)
+        
+        readings = database.get_list('light_series', 0, database.get_list_length('light_series'))
         for read in readings:
             print("IM BAKK ", read)
 
