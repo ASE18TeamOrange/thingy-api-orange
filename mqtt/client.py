@@ -11,7 +11,7 @@ class MqttClient:
     MQTT_BROKER_ADDR = 'mqtt://orange:164e089363@mqtt.thing.zone:1898'
 
     # Thingy services and characteristics
-    THNGY_NAME = '3rmfSzjVcyWknuTicTfnJA'  # TODO: find a way to update this variable with the current thingy id
+    THNGY_NAME = '_AFPEye74mPxrzSvFPWlYA'  # TODO: find a way to update this variable with the current thingy id
 
     # Thingy configuration service
     THNGY_CONFIG_UUID = 'ef680100-9b35-4933-9b10-52ffa9740042'
@@ -22,6 +22,7 @@ class MqttClient:
     THNGY_ENV_TMP_UUID = 'ef680201-9b35-4933-9b10-52ffa9740042'
     THNGY_ENV_PRESS_UUID = 'ef680202-9b35-4933-9b10-52ffa9740042'
     THNGY_ENV_HUMID_UUID = 'ef680203-9b35-4933-9b10-52ffa9740042'
+    THNGY_ENV_GAS_UUID = 'ef680204-9b35-4933-9b10-52ffa9740042'
 
     # Thingy user interface service
     THNGY_USR_INTERF_UUID = 'ef680300-9b35-4933-9b10-52ffa9740042'
@@ -51,7 +52,8 @@ class MqttClient:
                     'temperature': temperature,
                     'date': date
                 }
-
+                print(data)
+                print("key: ", key)
                 database.enqueue(key, data)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_TMP_UUID))])
@@ -60,8 +62,9 @@ class MqttClient:
         except ClientException as ce:
             print(ce)
 
-        hund = database.get_list('temperature_series', 0, 3)
-        print(hund)
+        readings = database.get_list('temperature_series', 0, database.get_list_length('temperature_series'))
+        for read in readings:
+            print("IM BAKK ", read)
 
     @asyncio.coroutine
     def pressure_coro(self, database, key):
@@ -72,21 +75,33 @@ class MqttClient:
 
             # yield from C.subscribe([('#', QOS_1)])
 
-            for i in range(1, 10):
+            for i in range(1, 5):
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 # TODO: check the parsing of pressure data - it seems like wrong values (~180 instead of ~1000)
+                
                 integer = packet.payload.data[0]
                 decimal = packet.payload.data[4]
-                temperature = integer + (decimal / 100)
+                pressure = integer + (decimal / 100.0)
+                date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
+                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(pressure)))
+
+                data = {
+                    'pressure': pressure,
+                    'date': date
+                }
+                print(data)
+                database.enqueue(key, data)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_PRESS_UUID))])
             yield from C.disconnect()
         except ClientException as ce:
             print(ce)
-
+        
+        readings = database.get_list('pressure_series', 0, database.get_list_length('pressure_series'))
+        for read in readings:
+            print("IM BAKK ", read)
 
     @asyncio.coroutine
     def humidity_coro(self, database, key):
@@ -101,14 +116,61 @@ class MqttClient:
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 humidity = packet.payload.data[0]
+                date = str(datetime.now())
 
                 print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(humidity)))
+
+                data = {
+                    'humidity': humidity,
+                    'date': date
+                }
+                print(data)
+                database.enqueue(key, data)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_HUMID_UUID))])
             yield from C.disconnect()
         except ClientException as ce:
-            print(ce)
+            print("Error while running coroutine: ", ce)
+        
+        readings = database.get_list('humidity_series', 0, database.get_list_length('humidity_series'))
+        for read in readings:
+            print("IM BAKK ", read)
 
+    @asyncio.coroutine
+    def gas_coro(self, database, key):
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_GAS_UUID), QOS_1)])
+
+            # yield from C.subscribe([('#', QOS_1)])
+
+            for i in range(1, 10):
+                message = yield from C.deliver_message()
+                packet = message.publish_packet
+                gas = {
+                'eco2': packet.payload.data[0],
+                'tvoc': packet.payload.data[2]
+                }
+                date = str(datetime.now())
+
+                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(gas)))
+
+                data = {
+                    'gas': gas,
+                    'date': date
+                }
+                print(data)
+                database.enqueue(key, data)
+
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_GAS_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            print("Error while running coroutine: ", ce)
+        
+        readings = database.get_list('gas_series', 0, database.get_list_length('gas_series'))
+        for read in readings:
+            print("IM BAKK ", read)
 
     @asyncio.coroutine
     def button_coro(self):

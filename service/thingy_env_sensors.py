@@ -18,7 +18,6 @@ class EnvironmentSensorDataService:
     def run_temperature_service(self, name):
         key = self.__esd.temperatures(name)
         if key is not None:
-            #asyncio.get_event_loop().run_until_complete(self.__mqtt_client.temp_coro(self.__database, key))
             asyncio.ensure_future(self.__mqtt_client.temp_coro(self.__database, key))
 
     def run_pressure_service(self, name):
@@ -30,3 +29,8 @@ class EnvironmentSensorDataService:
         key = self.__esd.humidities(name)
         if key is not None:
             asyncio.ensure_future(self.__mqtt_client.humidity_coro(self.__database, key))
+
+    def run_gas_service(self, name):
+        key = self.__esd.gases(name)
+        if key is not None:
+            asyncio.ensure_future(self.__mqtt_client.gas_coro(self.__database, key))
