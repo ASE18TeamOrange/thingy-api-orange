@@ -1,10 +1,6 @@
 import aiohttp_cors
 import views
-import controllers.user
-import controllers.temperature
-import controllers.pressure
-import controllers.humidity
-import controllers.gas
+from controllers import user, temperature, humidity, pressure, gas, light
 
 def setup_routes(app):
     # Configure default CORS settings
@@ -28,7 +24,7 @@ def setup_routes(app):
     cors.add(last_temp_resource.add_route("GET", views.LastTempView))
 
     user_temperature_log = cors.add(app.router.add_resource("/log_temperatures/", name='temperatures'))
-    cors.add(user_temperature_log.add_route("GET", controllers.temperature.log_temperatures))
+    cors.add(user_temperature_log.add_route("GET", temperature.log_temperatures))
     # cors.add(user_temperature_log.add_route("DELETE", controllers.temperature.delete_temperature_log))
 
     # Pressure
@@ -39,7 +35,7 @@ def setup_routes(app):
     cors.add(last_press_resource.add_route("GET", views.LastPressView))
 
     user_pressure_log = cors.add(app.router.add_resource("/log_pressures/", name='pressures'))
-    cors.add(user_pressure_log.add_route("GET", controllers.pressure.log_pressures))
+    cors.add(user_pressure_log.add_route("GET", pressure.log_pressures))
     # cors.add(user_pressure_log.add_route("DELETE", controllers.pressure.delete_pressure_log))
 
     # Humidity
@@ -50,7 +46,7 @@ def setup_routes(app):
     cors.add(last_humid_resource.add_route("GET", views.LastHumidView))
 
     user_humidity_log = cors.add(app.router.add_resource("/log_humidity/", name='humidities'))
-    cors.add(user_humidity_log.add_route("GET", controllers.humidity.log_humidities))
+    cors.add(user_humidity_log.add_route("GET", humidity.log_humidities))
     # cors.add(user_humidity_log.add_route("DELETE", controllers.humidity.delete_humidity_log))
 
     # Gas
@@ -61,15 +57,26 @@ def setup_routes(app):
     cors.add(last_gas_resource.add_route("GET", views.LastGasView))
 
     user_gas_log = cors.add(app.router.add_resource("/log_gas/", name='log_gas'))
-    cors.add(user_gas_log.add_route("GET", controllers.gas.log_gases))
+    cors.add(user_gas_log.add_route("GET", gas.log_gases))
     # cors.add(user_gas_log.add_route("DELETE", controllers.gas.delete_gas_log))
+
+    # Light
+    light_resource = cors.add(app.router.add_resource("/light/", name='light'))
+    cors.add(light_resource.add_route("GET", views.LightView))
+
+    last_light_resource = cors.add(app.router.add_resource("/light/last", name='last_light'))
+    cors.add(last_light_resource.add_route("GET", views.LastLightView))
+
+    user_light_log = cors.add(app.router.add_resource("/log_light/", name='log_light'))
+    cors.add(user_light_log.add_route("GET", light.log_light))
+    # cors.add(user_light_log.add_route("DELETE", controllers.light.delete_light_log))
     ################################################
 
     ################################################
     # User
     add_user_resource = cors.add(app.router.add_resource("/user/", name='add_user'))
-    cors.add(add_user_resource.add_route("POST", controllers.user.create_user))
+    cors.add(add_user_resource.add_route("POST", user.create_user))
     delete_user_resource = cors.add(app.router.add_resource("/user/", name='delete_user'))
-    cors.add(delete_user_resource.add_route("DELETE", controllers.user.delete_user))
+    cors.add(delete_user_resource.add_route("DELETE", user.delete_user))
 
     # TODO: Add more resources and routes
