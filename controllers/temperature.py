@@ -15,8 +15,8 @@ def log_temperatures(request):
 
     #temp
     name = 'temperature_series'
-    temperature_service = EnvironmentSensorDataService()
-    temperature_service.run_temperature_service(name)
+    esd_service = EnvironmentSensorDataService()
+    esd_service.run_temperature_service(name)
 
     return web.Response(status=204)
 
@@ -33,7 +33,7 @@ def delete_temperature_log(request):
 
     #temp
     name = 'temperature_series'
-    temperature_log = EnvironmentSensorData()
-    temperature_log.delete(name)
+    esd = EnvironmentSensorData()
+    esd.delete(name)
 
     return web.Response(status=204)

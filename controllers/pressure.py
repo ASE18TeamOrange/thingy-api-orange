@@ -13,8 +13,8 @@ async def log_pressures(request):
     #     return web.json_response({'error': '"name" must be a string with at least one character'})
 
     name = 'pressure_series'
-    pressure_service = EnvironmentSensorDataService()
-    pressure_service.run_pressure_service(name)
+    esd_service = EnvironmentSensorDataService()
+    esd_service.run_pressure_service(name)
 
     return web.Response(status=204)
 
@@ -30,7 +30,7 @@ def delete_pressure_log(request):
 
     #temp
     name = 'pressure_series'
-    temperature_log = EnvironmentSensorData()
-    temperature_log.delete(name)
+    esd = EnvironmentSensorData()
+    esd.delete(name)
 
     return web.Response(status=204)

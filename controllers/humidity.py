@@ -13,8 +13,8 @@ async def log_humidities(request):
     #     return web.json_response({'error': '"name" must be a string with at least one character'})
 
     name = 'humidity_series'
-    humidity_service = EnvironmentSensorDataService()
-    humidity_service.run_humidity_service(name)
+    esd_service = EnvironmentSensorDataService()
+    esd_service.run_humidity_service(name)
 
     return web.Response(status=204)
 
@@ -34,7 +34,7 @@ def delete_humidity_log(request):
 
     #temp
     name = 'humidity_series'
-    temperature_log = EnvironmentSensorData()
-    temperature_log.delete(name)
+    esd = EnvironmentSensorData()
+    esd.delete(name)
 
     return web.Response(status=204)
