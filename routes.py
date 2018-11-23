@@ -23,7 +23,7 @@ def setup_routes(app):
     last_temp_resource = cors.add(app.router.add_resource("/temperature/last", name='last_temperature'))
     cors.add(last_temp_resource.add_route("GET", views.LastTempView))
 
-    user_temperature_log = cors.add(app.router.add_resource("/log_temperatures/", name='temperatures'))
+    user_temperature_log = cors.add(app.router.add_resource("/log_temperature/", name='log_temperature'))
     cors.add(user_temperature_log.add_route("GET", temperature.log_temperatures))
     # cors.add(user_temperature_log.add_route("DELETE", controllers.temperature.delete_temperature_log))
 
@@ -34,7 +34,7 @@ def setup_routes(app):
     last_press_resource = cors.add(app.router.add_resource("/pressure/last", name='last_pressure'))
     cors.add(last_press_resource.add_route("GET", views.LastPressView))
 
-    user_pressure_log = cors.add(app.router.add_resource("/log_pressures/", name='pressures'))
+    user_pressure_log = cors.add(app.router.add_resource("/log_pressure/", name='log_pressure'))
     cors.add(user_pressure_log.add_route("GET", pressure.log_pressures))
     # cors.add(user_pressure_log.add_route("DELETE", controllers.pressure.delete_pressure_log))
 
@@ -45,7 +45,7 @@ def setup_routes(app):
     last_humid_resource = cors.add(app.router.add_resource("/humidity/last", name='last_humidity'))
     cors.add(last_humid_resource.add_route("GET", views.LastHumidView))
 
-    user_humidity_log = cors.add(app.router.add_resource("/log_humidity/", name='humidities'))
+    user_humidity_log = cors.add(app.router.add_resource("/log_humidity/", name='log_humidity'))
     cors.add(user_humidity_log.add_route("GET", humidity.log_humidities))
     # cors.add(user_humidity_log.add_route("DELETE", controllers.humidity.delete_humidity_log))
 
