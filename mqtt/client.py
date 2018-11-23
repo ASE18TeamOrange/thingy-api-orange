@@ -11,7 +11,7 @@ class MqttClient:
     MQTT_BROKER_ADDR = 'mqtt://orange:164e089363@mqtt.thing.zone:1898'
 
     # Thingy services and characteristics
-    THNGY_NAME = '_AFPEye74mPxrzSvFPWlYA'  # TODO: find a way to update this variable with the current thingy id
+    THNGY_NAME = 'q33liyb-PwggRZN99sJrrw'  # TODO: find a way to update this variable with the current thingy id
 
     # Thingy configuration service
     THNGY_CONFIG_UUID = 'ef680100-9b35-4933-9b10-52ffa9740042'
@@ -48,14 +48,15 @@ class MqttClient:
                 date = str(datetime.now())
 
                 print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
-
                 data = {
                     'temperature': temperature,
                     'date': date
                 }
                 print(data)
-                print("key: ", key)
-                database.enqueue(key, data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_TMP_UUID))])
             yield from C.disconnect()
@@ -63,7 +64,7 @@ class MqttClient:
         except ClientException as ce:
             print(ce)
 
-        readings = database.get_list('temperature_series', 0, database.get_list_length('temperature_series'))
+        readings = database.get_set('temperature_series', 0, -1)
         for read in readings:
             print("IM BAKK ", read)
 
@@ -93,14 +94,17 @@ class MqttClient:
                     'date': date
                 }
                 print(data)
-                database.enqueue(key, data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_PRESS_UUID))])
             yield from C.disconnect()
         except ClientException as ce:
             print(ce)
         
-        readings = database.get_list('pressure_series', 0, database.get_list_length('pressure_series'))
+        readings = database.get_set('pressure_series', 0, -1)
         for read in readings:
             print("IM BAKK ", read)
 
@@ -126,14 +130,17 @@ class MqttClient:
                     'date': date
                 }
                 print(data)
-                database.enqueue(key, data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_HUMID_UUID))])
             yield from C.disconnect()
         except ClientException as ce:
-            print("Error while running coroutine: ", ce)
+            print(ce)
         
-        readings = database.get_list('humidity_series', 0, database.get_list_length('humidity_series'))
+        readings = database.get_set('humidity_series', 0, -1)
         for read in readings:
             print("IM BAKK ", read)
 
@@ -162,14 +169,17 @@ class MqttClient:
                     'date': date
                 }
                 print(data)
-                database.enqueue(key, data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_GAS_UUID))])
             yield from C.disconnect()
         except ClientException as ce:
-            print("Error while running coroutine: ", ce)
+            print(ce)
         
-        readings = database.get_list('gas_series', 0, database.get_list_length('gas_series'))
+        readings = database.get_set('gas_series', 0, -1)
         for read in readings:
             print("IM BAKK ", read)
 
@@ -200,14 +210,17 @@ class MqttClient:
                     'date': date
                 }
                 print(data)
-                database.enqueue(key, data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_LIGHT_UUID))])
             yield from C.disconnect()
         except ClientException as ce:
-            print("Error while running coroutine: ", ce)
+            print(ce)
         
-        readings = database.get_list('light_series', 0, database.get_list_length('light_series'))
+        readings = database.get_set('light_series', 0, -1)
         for read in readings:
             print("IM BAKK ", read)
 

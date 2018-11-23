@@ -13,7 +13,7 @@ class Temperature:
     async def all_readings(cls):
         """Get a list of all recorded temps"""
 
-        readings = cls.redis.get_list('temperature_series', 0, cls.redis.get_list_length('temperature_series'))
+        readings = cls.redis.get_set('temperature_series', 0, -1)
         readings_json = []
         for item in readings:
             item_json = literal_eval(item.decode('utf8'))
@@ -26,7 +26,7 @@ class Temperature:
         """Get the most recent temp recording"""
 
         # Get last reading from list
-        readings = cls.redis.get_list('temperature_series', 0, cls.redis.get_list_length('temperature_series'))
+        readings = cls.redis.get_set('temperature_series', 0, -1)
         most_recent_reading = readings[-1]
         reading_json = literal_eval(most_recent_reading.decode('utf8'))
 
@@ -43,7 +43,7 @@ class Pressure:
     async def all_readings(cls):
         """Get a list of all recorded pressures"""
 
-        readings = cls.redis.get_list('pressure_series', 0, cls.redis.get_list_length('pressure_series'))
+        readings = cls.redis.get_set('pressure_series', 0, -1)
         readings_json = []
         for item in readings:
             item_json = literal_eval(item.decode('utf8'))
@@ -56,7 +56,7 @@ class Pressure:
         """Get the most recent pressure recording"""
 
         # Get last reading from list
-        readings = cls.redis.get_list('pressure_series', 0, cls.redis.get_list_length('pressure_series'))
+        readings = cls.redis.get_set('pressure_series', 0, -1)
         most_recent_reading = readings[-1]
         reading_json = literal_eval(most_recent_reading.decode('utf8'))
 
@@ -73,7 +73,7 @@ class Humidity:
     async def all_readings(cls):
         """Get a list of all recorded humidities"""
 
-        readings = cls.redis.get_list('humidity_series', 0, cls.redis.get_list_length('humidity_series'))
+        readings = cls.redis.get_set('humidity_series', 0, -1)
         readings_json = []
         for item in readings:
             item_json = literal_eval(item.decode('utf8'))
@@ -86,7 +86,7 @@ class Humidity:
         """Get the most recent humidity recording"""
 
         # Get last reading from list
-        readings = cls.redis.get_list('humidity_series', 0, cls.redis.get_list_length('humidity_series'))
+        readings = cls.redis.get_set('humidity_series', 0, -1)
         most_recent_reading = readings[-1]
         reading_json = literal_eval(most_recent_reading.decode('utf8'))
 
@@ -103,7 +103,7 @@ class Gas:
     async def all_readings(cls):
         """Get a list of all recorded gases"""
 
-        readings = cls.redis.get_list('gas_series', 0, cls.redis.get_list_length('gas_series'))
+        readings = cls.redis.get_set('gas_series', 0, -1)
         readings_json = []
         for item in readings:
             item_json = literal_eval(item.decode('utf8'))
@@ -116,7 +116,7 @@ class Gas:
         """Get the most recent gas recording"""
 
         # Get last reading from list
-        readings = cls.redis.get_list('gas_series', 0, cls.redis.get_list_length('gas_series'))
+        readings = cls.redis.get_set('gas_series', 0, -1)
         most_recent_reading = readings[-1]
         reading_json = literal_eval(most_recent_reading.decode('utf8'))
 
@@ -133,7 +133,7 @@ class Light:
     async def all_readings(cls):
         """Get a list of all recorded light"""
 
-        readings = cls.redis.get_list('light_series', 0, cls.redis.get_list_length('light_series'))
+        readings = cls.redis.get_set('light_series', 0, -1)
         readings_json = []
         for item in readings:
             item_json = literal_eval(item.decode('utf8'))
@@ -146,7 +146,7 @@ class Light:
         """Get the most recent light recording"""
 
         # Get last reading from list
-        readings = cls.redis.get_list('light_series', 0, cls.redis.get_list_length('light_series'))
+        readings = cls.redis.get_set('light_series', 0, -1)
         most_recent_reading = readings[-1]
         reading_json = literal_eval(most_recent_reading.decode('utf8'))
 
