@@ -30,8 +30,19 @@ class MqttClient:
     THNGY_USR_INTERF_LED_UUID = 'ef680301-9b35-4933-9b10-52ffa9740042'
     THNGY_USR_INTERF_BUTTON_UUID = 'ef680302-9b35-4933-9b10-52ffa9740042'
 
+
+    ########################
+    # Below is the implementation of coroutines for gathering sensor data from a Nordic Thingy device. 
+    # The MQTTClient instance connects to the specified MQTT broker and subscribes to the desired service (e.g. temperature). Then, it awaits messages from the broker and parses them appropriately. Finally, it stores the sensor readings in the database.
+    # Also, in every cycle a check is performed to see if there are expired sensor readings in the database. If the check is positive, the expired values are deleted.
+    ########################
+
+
     @asyncio.coroutine
     def temp_coro(self, database, key):
+        """
+        Get temperature readings from Thingy and store in database
+        """
         try:
             C = MQTTClient()
             yield from C.connect(self.MQTT_BROKER_ADDR)
@@ -72,6 +83,9 @@ class MqttClient:
 
     @asyncio.coroutine
     def pressure_coro(self, database, key):
+        """
+        Get pressure readings from Thingy and store in database
+        """
         try:
             C = MQTTClient()
             yield from C.connect(self.MQTT_BROKER_ADDR)
@@ -114,6 +128,9 @@ class MqttClient:
 
     @asyncio.coroutine
     def humidity_coro(self, database, key):
+        """
+        Get humidity readings from Thingy and store in database
+        """
         try:
             C = MQTTClient()
             yield from C.connect(self.MQTT_BROKER_ADDR)
@@ -152,6 +169,9 @@ class MqttClient:
 
     @asyncio.coroutine
     def gas_coro(self, database, key):
+        """
+        Get CO2 readings from Thingy and store in database
+        """
         try:
             C = MQTTClient()
             yield from C.connect(self.MQTT_BROKER_ADDR)
@@ -193,6 +213,9 @@ class MqttClient:
 
     @asyncio.coroutine
     def light_coro(self, database, key):
+        """
+        Get light intensity readings from Thingy and store in database
+        """
         try:
             C = MQTTClient()
             yield from C.connect(self.MQTT_BROKER_ADDR)
