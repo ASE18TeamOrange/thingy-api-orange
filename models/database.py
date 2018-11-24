@@ -9,6 +9,7 @@ class Database:
     """
 
     __connection = None
+    __time_range = 86400 # TTL for database entries in seconds. Currently set to 86400 (1 day).
 
     def __init__(self):
         self.__connection = redis.Redis(host='localhost', port=6379, db=0)
@@ -33,3 +34,8 @@ class Database:
 
     def delete(self, key):
         self.__connection.delete(key)
+
+    def del_expired_items(self, key, curr_time):
+        print("checking for expired items")
+        rem = self.__connection.zremrangebyscore(key, -math.inf, curr_time - self.__time_range)
+        print("removed items: ", rem)

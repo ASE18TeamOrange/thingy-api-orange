@@ -38,8 +38,10 @@ class MqttClient:
             yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_TMP_UUID), QOS_1)])
 
             # yield from C.subscribe([('#', QOS_1)])
-
-            for i in range(1, 5):
+            
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('temperature_series', datetime.now().timestamp())
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 integer = packet.payload.data[0]
@@ -47,7 +49,7 @@ class MqttClient:
                 temperature = integer + (decimal / 100)
                 date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
+                print("%s => %s" % (packet.variable_header.topic_name, str(temperature)))
                 data = {
                     'temperature': temperature,
                     'date': date
@@ -77,7 +79,9 @@ class MqttClient:
 
             # yield from C.subscribe([('#', QOS_1)])
 
-            for i in range(1, 5):
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('pressure_series', datetime.now().timestamp())
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 # TODO: check the parsing of pressure data - it seems like wrong values (~180 instead of ~1000)
@@ -87,7 +91,7 @@ class MqttClient:
                 pressure = integer + (decimal / 100.0)
                 date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(pressure)))
+                print("%s => %s" % (packet.variable_header.topic_name, str(pressure)))
 
                 data = {
                     'pressure': pressure,
@@ -117,13 +121,15 @@ class MqttClient:
 
             # yield from C.subscribe([('#', QOS_1)])
 
-            for i in range(1, 10):
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('humidity_series', datetime.now().timestamp())
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 humidity = packet.payload.data[0]
                 date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(humidity)))
+                print("%s => %s" % (packet.variable_header.topic_name, str(humidity)))
 
                 data = {
                     'humidity': humidity,
@@ -153,7 +159,9 @@ class MqttClient:
 
             # yield from C.subscribe([('#', QOS_1)])
 
-            for i in range(1, 10):
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('gas_series', datetime.now().timestamp())
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 gas = {
@@ -162,7 +170,7 @@ class MqttClient:
                 }
                 date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(gas)))
+                print("%s => %s" % (packet.variable_header.topic_name, str(gas)))
 
                 data = {
                     'gas': gas,
@@ -192,7 +200,9 @@ class MqttClient:
 
             # yield from C.subscribe([('#', QOS_1)])
 
-            for i in range(1, 10):
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('light_series', datetime.now().timestamp())
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 color = {
@@ -203,7 +213,7 @@ class MqttClient:
                 }
                 date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(color)))
+                print("%s => %s" % (packet.variable_header.topic_name, str(color)))
 
                 data = {
                     'color': color,
