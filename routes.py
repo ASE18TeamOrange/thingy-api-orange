@@ -25,7 +25,7 @@ def setup_routes(app):
 
     user_temperature_log = cors.add(app.router.add_resource("/log_temperature/", name='log_temperature'))
     cors.add(user_temperature_log.add_route("GET", temperature.log_temperatures))
-    # cors.add(user_temperature_log.add_route("DELETE", controllers.temperature.delete_temperature_log))
+    cors.add(user_temperature_log.add_route("DELETE", temperature.delete_temperature_log))
 
     # Pressure
     press_resource = cors.add(app.router.add_resource("/pressure/", name='pressure'))
@@ -36,7 +36,7 @@ def setup_routes(app):
 
     user_pressure_log = cors.add(app.router.add_resource("/log_pressure/", name='log_pressure'))
     cors.add(user_pressure_log.add_route("GET", pressure.log_pressures))
-    # cors.add(user_pressure_log.add_route("DELETE", controllers.pressure.delete_pressure_log))
+    cors.add(user_pressure_log.add_route("DELETE", pressure.delete_pressure_log))
 
     # Humidity
     humid_resource = cors.add(app.router.add_resource("/humidity/", name='humidity'))
@@ -47,7 +47,7 @@ def setup_routes(app):
 
     user_humidity_log = cors.add(app.router.add_resource("/log_humidity/", name='log_humidity'))
     cors.add(user_humidity_log.add_route("GET", humidity.log_humidities))
-    # cors.add(user_humidity_log.add_route("DELETE", controllers.humidity.delete_humidity_log))
+    cors.add(user_humidity_log.add_route("DELETE", humidity.delete_humidity_log))
 
     # Gas
     gas_resource = cors.add(app.router.add_resource("/gas/", name='gas'))
@@ -58,7 +58,7 @@ def setup_routes(app):
 
     user_gas_log = cors.add(app.router.add_resource("/log_gas/", name='log_gas'))
     cors.add(user_gas_log.add_route("GET", gas.log_gases))
-    # cors.add(user_gas_log.add_route("DELETE", controllers.gas.delete_gas_log))
+    cors.add(user_gas_log.add_route("DELETE", gas.delete_gas_log))
 
     # Light
     light_resource = cors.add(app.router.add_resource("/light/", name='light'))
@@ -69,7 +69,7 @@ def setup_routes(app):
 
     user_light_log = cors.add(app.router.add_resource("/log_light/", name='log_light'))
     cors.add(user_light_log.add_route("GET", light.log_light))
-    # cors.add(user_light_log.add_route("DELETE", controllers.light.delete_light_log))
+    cors.add(user_light_log.add_route("DELETE", light.delete_light_log))
     ################################################
 
     ################################################
