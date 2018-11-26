@@ -11,7 +11,7 @@ class MqttClient:
     MQTT_BROKER_ADDR = 'mqtt://orange:164e089363@mqtt.thing.zone:1898'
 
     # Thingy services and characteristics
-    THNGY_NAME = '3rmfSzjVcyWknuTicTfnJA'  # TODO: find a way to update this variable with the current thingy id
+    THNGY_NAME = 'q33liyb-PwggRZN99sJrrw'  # TODO: find a way to update this variable with the current thingy id
 
     # Thingy configuration service
     THNGY_CONFIG_UUID = 'ef680100-9b35-4933-9b10-52ffa9740042'
@@ -22,22 +22,37 @@ class MqttClient:
     THNGY_ENV_TMP_UUID = 'ef680201-9b35-4933-9b10-52ffa9740042'
     THNGY_ENV_PRESS_UUID = 'ef680202-9b35-4933-9b10-52ffa9740042'
     THNGY_ENV_HUMID_UUID = 'ef680203-9b35-4933-9b10-52ffa9740042'
+    THNGY_ENV_GAS_UUID = 'ef680204-9b35-4933-9b10-52ffa9740042'
+    THNGY_ENV_LIGHT_UUID = 'ef680205-9b35-4933-9b10-52ffa9740042'
 
     # Thingy user interface service
     THNGY_USR_INTERF_UUID = 'ef680300-9b35-4933-9b10-52ffa9740042'
     THNGY_USR_INTERF_LED_UUID = 'ef680301-9b35-4933-9b10-52ffa9740042'
     THNGY_USR_INTERF_BUTTON_UUID = 'ef680302-9b35-4933-9b10-52ffa9740042'
 
+
+    ########################
+    # Below is the implementation of coroutines for gathering sensor data from a Nordic Thingy device. 
+    # The MQTTClient instance connects to the specified MQTT broker and subscribes to the desired service (e.g. temperature). Then, it awaits messages from the broker and parses them appropriately. Finally, it stores the sensor readings in the database.
+    # Also, in every cycle a check is performed to see if there are expired sensor readings in the database. If the check is positive, the expired values are deleted.
+    ########################
+
+
     @asyncio.coroutine
     def temp_coro(self, database, key):
+        """
+        Get temperature readings from Thingy and store in database
+        """
         try:
             C = MQTTClient()
             yield from C.connect(self.MQTT_BROKER_ADDR)
             yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_TMP_UUID), QOS_1)])
 
             # yield from C.subscribe([('#', QOS_1)])
-
-            for i in range(1, 5):
+            
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('temperature_series', datetime.now().timestamp())
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 integer = packet.payload.data[0]
@@ -45,14 +60,16 @@ class MqttClient:
                 temperature = integer + (decimal / 100)
                 date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
-
+                print("%s => %s" % (packet.variable_header.topic_name, str(temperature)))
                 data = {
                     'temperature': temperature,
                     'date': date
                 }
-
-                database.enqueue(key, data)
+                print(data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_TMP_UUID))])
             yield from C.disconnect()
@@ -60,11 +77,15 @@ class MqttClient:
         except ClientException as ce:
             print(ce)
 
-        hund = database.get_list('temperature_series', 0, 3)
-        print(hund)
+        readings = database.get_set('temperature_series', 0, -1)
+        for read in readings:
+            print("IM BAKK ", read)
 
     @asyncio.coroutine
     def pressure_coro(self, database, key):
+        """
+        Get pressure readings from Thingy and store in database
+        """
         try:
             C = MQTTClient()
             yield from C.connect(self.MQTT_BROKER_ADDR)
@@ -72,24 +93,44 @@ class MqttClient:
 
             # yield from C.subscribe([('#', QOS_1)])
 
-            for i in range(1, 10):
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('pressure_series', datetime.now().timestamp())
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 # TODO: check the parsing of pressure data - it seems like wrong values (~180 instead of ~1000)
+
                 integer = packet.payload.data[0]
                 decimal = packet.payload.data[4]
-                temperature = integer + (decimal / 100)
+                pressure = integer + (decimal / 100.0)
+                date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(temperature)))
+                print("%s => %s" % (packet.variable_header.topic_name, str(pressure)))
+
+                data = {
+                    'pressure': pressure,
+                    'date': date
+                }
+                print(data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_PRESS_UUID))])
             yield from C.disconnect()
         except ClientException as ce:
             print(ce)
-
+        
+        readings = database.get_set('pressure_series', 0, -1)
+        for read in readings:
+            print("IM BAKK ", read)
 
     @asyncio.coroutine
     def humidity_coro(self, database, key):
+        """
+        Get humidity readings from Thingy and store in database
+        """
         try:
             C = MQTTClient()
             yield from C.connect(self.MQTT_BROKER_ADDR)
@@ -97,18 +138,124 @@ class MqttClient:
 
             # yield from C.subscribe([('#', QOS_1)])
 
-            for i in range(1, 10):
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('humidity_series', datetime.now().timestamp())
                 message = yield from C.deliver_message()
                 packet = message.publish_packet
                 humidity = packet.payload.data[0]
+                date = str(datetime.now())
 
-                print("%d:  %s => %s" % (i, packet.variable_header.topic_name, str(humidity)))
+                print("%s => %s" % (packet.variable_header.topic_name, str(humidity)))
+
+                data = {
+                    'humidity': humidity,
+                    'date': date
+                }
+                print(data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
 
             yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_HUMID_UUID))])
             yield from C.disconnect()
         except ClientException as ce:
             print(ce)
+        
+        readings = database.get_set('humidity_series', 0, -1)
+        for read in readings:
+            print("IM BAKK ", read)
 
+    @asyncio.coroutine
+    def gas_coro(self, database, key):
+        """
+        Get CO2 readings from Thingy and store in database
+        """
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_GAS_UUID), QOS_1)])
+
+            # yield from C.subscribe([('#', QOS_1)])
+
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('gas_series', datetime.now().timestamp())
+                message = yield from C.deliver_message()
+                packet = message.publish_packet
+                gas = {
+                'eco2': packet.payload.data[0],
+                'tvoc': packet.payload.data[2]
+                }
+                date = str(datetime.now())
+
+                print("%s => %s" % (packet.variable_header.topic_name, str(gas)))
+
+                data = {
+                    'gas': gas,
+                    'date': date
+                }
+                print(data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
+
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_GAS_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            print(ce)
+        
+        readings = database.get_set('gas_series', 0, -1)
+        for read in readings:
+            print("IM BAKK ", read)
+
+    @asyncio.coroutine
+    def light_coro(self, database, key):
+        """
+        Get light intensity readings from Thingy and store in database
+        """
+        try:
+            C = MQTTClient()
+            yield from C.connect(self.MQTT_BROKER_ADDR)
+            yield from C.subscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_LIGHT_UUID), QOS_1)])
+
+            # yield from C.subscribe([('#', QOS_1)])
+
+            while True:
+                # Remove expires entries in database
+                database.del_expired_items('light_series', datetime.now().timestamp())
+                message = yield from C.deliver_message()
+                packet = message.publish_packet
+                color = {
+                'red':  packet.payload.data[0],
+                'green': packet.payload.data[2],
+                'blue': packet.payload.data[4],
+                'clear': packet.payload.data[6]
+                }
+                date = str(datetime.now())
+
+                print("%s => %s" % (packet.variable_header.topic_name, str(color)))
+
+                data = {
+                    'color': color,
+                    'date': date
+                }
+                print(data)
+                score = datetime.now().timestamp()
+                print(score)
+                
+                database.enqueue(key, data, score)
+
+            yield from C.unsubscribe([('%s/%s/%s' % (self.THNGY_NAME, self.THNGY_ENV_UUID, self.THNGY_ENV_LIGHT_UUID))])
+            yield from C.disconnect()
+        except ClientException as ce:
+            print(ce)
+        
+        readings = database.get_set('light_series', 0, -1)
+        for read in readings:
+            print("IM BAKK ", read)
 
     @asyncio.coroutine
     def button_coro(self):
