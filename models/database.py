@@ -39,3 +39,15 @@ class Database:
         print("checking for expired items")
         rem = self.__connection.zremrangebyscore(key, -math.inf, curr_time - self.__time_range)
         print("removed items: ", rem)
+
+    def get_hash(self, key, hash_name):
+        return self.__connection.hget(key, hash_name)
+
+    def set_hash(self, key, hash_key, val):
+        return self.__connection.hset(key, hash_key, val)
+
+    def set_hash_multiple(self, key, values):
+        return self.__connection.hmset(key, values)
+    
+    def delete_hash(self, key, hash_key):
+        return self.__connection.hdel(key, hash_key)
