@@ -11,7 +11,7 @@ class MqttClient:
     MQTT_BROKER_ADDR = 'mqtt://orange:164e089363@mqtt.thing.zone:1898'
 
     # Thingy services and characteristics
-    THNGY_NAME = 'q33liyb-PwggRZN99sJrrw'  # TODO: find a way to update this variable with the current thingy id
+    THNGY_NAME = 'nWjiNW08hk2lPZudLs8qRQ'  # TODO: find a way to update this variable with the current thingy id
 
     # Thingy configuration service
     THNGY_CONFIG_UUID = 'ef680100-9b35-4933-9b10-52ffa9740042'

@@ -74,8 +74,15 @@ def setup_routes(app):
 
     ################################################
     # User
-    user_resource = cors.add(app.router.add_resource("/user/", name='user'))
-    cors.add(user_resource.add_route("POST", user.post))
-    cors.add(user_resource.add_route("DELETE", user.delete))
+    user_register = cors.add(app.router.add_resource("/user/", name='user'))
+    cors.add(user_register.add_route("POST", user.post))
+    cors.add(user_register.add_route("DELETE", user.delete))
 
-    # TODO: Add more resources and routes
+    user_login = cors.add(app.router.add_resource("/login/", name="login"))
+    cors.add(user_login.add_route("POST", user.login))
+
+    user_logout = cors.add(app.router.add_resource("/logout/", name="logout"))
+    cors.add(user_logout.add_route("POST", user.logout))
+
+    user_profile = cors.add(app.router.add_resource("/user/{login}", name="user_profile"))
+    cors.add(user_profile.add_route("GET", user.show_profile))

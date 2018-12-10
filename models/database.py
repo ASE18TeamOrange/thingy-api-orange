@@ -43,6 +43,9 @@ class Database:
     def get_hash(self, key, hash_name):
         return self.__connection.hget(key, hash_name)
 
+    def get_hash_all(self, key):
+        return self.__connection.hgetall(key)
+
     def set_hash(self, key, hash_key, val):
         return self.__connection.hset(key, hash_key, val)
 
@@ -51,3 +54,6 @@ class Database:
     
     def delete_hash(self, key, hash_key):
         return self.__connection.hdel(key, hash_key)
+
+    def key_exists_in_hash(self, key, hash_key):
+        return self.__connection.hexists(key, hash_key)

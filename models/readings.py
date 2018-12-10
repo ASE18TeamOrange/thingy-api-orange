@@ -27,10 +27,13 @@ class Temperature:
 
         # Get last reading from list
         readings = cls.redis.get_set('temperature_series', 0, -1)
-        most_recent_reading = readings[-1]
-        reading_json = literal_eval(most_recent_reading.decode('utf8'))
 
-        return reading_json
+        if cls.redis.get_set_len(readings) > 0:
+            most_recent_reading = readings[-1]
+            reading_json = literal_eval(most_recent_reading.decode('utf8'))
+            return reading_json
+        
+        return None
 
 
 class Pressure:
@@ -57,8 +60,13 @@ class Pressure:
 
         # Get last reading from list
         readings = cls.redis.get_set('pressure_series', 0, -1)
-        most_recent_reading = readings[-1]
-        reading_json = literal_eval(most_recent_reading.decode('utf8'))
+        
+        if cls.redis.get_set_len(readings) > 0:
+            most_recent_reading = readings[-1]
+            reading_json = literal_eval(most_recent_reading.decode('utf8'))
+            return reading_json
+        
+        return None
 
         return reading_json
 
@@ -87,8 +95,13 @@ class Humidity:
 
         # Get last reading from list
         readings = cls.redis.get_set('humidity_series', 0, -1)
-        most_recent_reading = readings[-1]
-        reading_json = literal_eval(most_recent_reading.decode('utf8'))
+        
+        if cls.redis.get_set_len(readings) > 0:
+            most_recent_reading = readings[-1]
+            reading_json = literal_eval(most_recent_reading.decode('utf8'))
+            return reading_json
+        
+        return None
 
         return reading_json
 
@@ -117,8 +130,13 @@ class Gas:
 
         # Get last reading from list
         readings = cls.redis.get_set('gas_series', 0, -1)
-        most_recent_reading = readings[-1]
-        reading_json = literal_eval(most_recent_reading.decode('utf8'))
+        
+        if cls.redis.get_set_len(readings) > 0:
+            most_recent_reading = readings[-1]
+            reading_json = literal_eval(most_recent_reading.decode('utf8'))
+            return reading_json
+        
+        return None
 
         return reading_json
 
@@ -147,7 +165,12 @@ class Light:
 
         # Get last reading from list
         readings = cls.redis.get_set('light_series', 0, -1)
-        most_recent_reading = readings[-1]
-        reading_json = literal_eval(most_recent_reading.decode('utf8'))
+        
+        if cls.redis.get_set_len(readings) > 0:
+            most_recent_reading = readings[-1]
+            reading_json = literal_eval(most_recent_reading.decode('utf8'))
+            return reading_json
+        
+        return None
 
         return reading_json
