@@ -15,27 +15,27 @@ class EnvironmentSensorDataService:
         self.__esd = EnvironmentSensorData()
         self.__mqtt_client = MqttClient()
 
-    def run_temperature_service(self, name):
-        key = self.__esd.temperatures(name)
+    def run_temperature_service(self, thingy, user, name):
+        key = self.__esd.temperatures(user, name)
         if key is not None:
-            asyncio.ensure_future(self.__mqtt_client.temp_coro(self.__database, key))
+            asyncio.ensure_future(self.__mqtt_client.temp_coro(self.__database, thingy, key))
 
-    def run_pressure_service(self, name):
-        key = self.__esd.pressures(name)
+    def run_pressure_service(self, thingy, user, name):
+        key = self.__esd.pressures(user, name)
         if key is not None:
-            asyncio.ensure_future(self.__mqtt_client.pressure_coro(self.__database, key))
+            asyncio.ensure_future(self.__mqtt_client.pressure_coro(self.__database, thingy, key))
 
-    def run_humidity_service(self, name):
-        key = self.__esd.humidities(name)
+    def run_humidity_service(self, thingy, user, name):
+        key = self.__esd.humidities(user, name)
         if key is not None:
-            asyncio.ensure_future(self.__mqtt_client.humidity_coro(self.__database, key))
+            asyncio.ensure_future(self.__mqtt_client.humidity_coro(self.__database, thingy, key))
 
-    def run_gas_service(self, name):
-        key = self.__esd.gases(name)
+    def run_gas_service(self, thingy, user, name):
+        key = self.__esd.gases(user, name)
         if key is not None:
-            asyncio.ensure_future(self.__mqtt_client.gas_coro(self.__database, key))
+            asyncio.ensure_future(self.__mqtt_client.gas_coro(self.__database, thingy, key))
     
-    def run_light_service(self, name):
-        key = self.__esd.lights(name)
+    def run_light_service(self, thingy, user, name):
+        key = self.__esd.lights(user, name)
         if key is not None:
-            asyncio.ensure_future(self.__mqtt_client.light_coro(self.__database, key))
+            asyncio.ensure_future(self.__mqtt_client.light_coro(self.__database, thingy, key))
