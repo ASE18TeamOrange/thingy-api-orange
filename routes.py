@@ -15,6 +15,10 @@ def setup_routes(app):
     # Routes
 
     ################################################
+    # Connection with Thingy
+    connection_res = cors.add(app.router.add_resource("/connect/", name='connect'))
+    cors.add(connection_res.add_route("POST", user.connect_thingy))
+    ################################################
     # Environment
     # Temperature
     temp_resource = cors.add(app.router.add_resource("/temperature/", name='temperature'))

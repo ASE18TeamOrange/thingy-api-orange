@@ -136,6 +136,23 @@ class User:
             return profile
         
         return None
+    
+
+    @classmethod
+    async def connect_thingy(cls, login, thingy):
+        redis = Database()
+        llogin = login.lower()
+
+        if redis.key_exists_in_hash('users:', llogin):
+            db_entry = redis.get_hash('users:', llogin)
+            user_dict = literal_eval(db_entry.decode('utf-8'))
+            uuid = user_dict['id']
+            print(uuid)
+
+            return redis.set_hash("user:%s"%uuid, "thingy", thingy)
+        
+        return None
+
 
 
 

@@ -27,7 +27,7 @@ def token_required(f):
             data = jwt.decode(token, request.app['JWT_KEY'], algorithms=JWT_ALG)
             print("DAT: ", data)
             current_user = data['login']
-            print("User: ", login)
+            print("User: ", current_user)
         except jwt.ExpiredSignatureError:
             return Response(text='Signature expired. Please log in again.')
         except jwt.InvalidTokenError:
@@ -152,9 +152,41 @@ async def logout(request, current_user):
         print(e)
         print("Login not found")
 
+    if login != current_user:
+        return Response(text="You have no power here!", status=403)
+
     result = await User.logout(login)
     
     if result is None:
         return Response(text="User already logged out!", status=401)
 
     return Response(text="Logout successful!", status=200)
+
+
+@token_required
+@asyncio.coroutine
+async def connect_thingy(request, current_user):
+    request_json = await request.json()
+    print(request_json)
+
+    try:
+        login = request_json['login']
+    except Exception as e:
+        print(e)
+        print("Login not found")
+
+    try:
+        thingy_id = request_json['thingy_id']
+    except Exception as e:
+        print(e)
+        print("Thingy id not found")
+
+    if login != current_user:
+        return Response(text="You have no power here!", status=403)
+
+    result = await User.connect_thingy(login, thingy_id)
+    
+    if result is None:
+        return Response(text="User not found", status=401)
+
+    return Response(text="Successfully connected!", status=200)

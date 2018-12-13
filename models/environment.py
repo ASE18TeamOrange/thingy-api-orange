@@ -14,54 +14,44 @@ class EnvironmentSensorData:
     def __init__(self):
         self.__database = Database()
 
-    def __get_key(self, name, measure):
-        return name + '#' + measure
+    def __get_key(self, user_id, measure):
+        print("%s:%s" % (user_id, measure))
+        return "%s:%s" % (user_id, measure)
 
     #todo we need to have a strategy: overwrite or not if key present??. Currently it will overwrite
-    def temperatures(self, name):
-        key = 'temperature_series'
-        # key = self.__get_key(name, self.__temp)
-        # if not self.exists(key):
-        #     self.__database.insert(key, [])
+    def temperatures(self, user, name):
+        key = self.__get_key(user, name)
         print("keyy: ",key)
         return key
 
 
-    def pressures(self, name):
-        key = 'pressure_series'
-        # key = self.__get_key(name, self.__pressure)
-        # if not self.exists(key):
-        #     self.__database.insert(key, [])
+    def pressures(self, user, name):
+        key = self.__get_key(user, name)
         print("keyy: ",key)
         return key
 
 
-    def humidities(self, name):
-        key = 'humidity_series'
-        # key = self.__get_key(name, self.__humidity)
-        # if not self.exists(key):
-        #     self.__database.insert(key, [])
+    def humidities(self, user, name):
+        key = self.__get_key(user, name)
+        print("keyy: ",key)
         return key
 
-    def gases(self, name):
-        key = 'gas_series'
-        # key = self.__get_key(name, self.__gas)
-        # if not self.exists(key):
-        #     self.__database.insert(key, [])
+    def gases(self, user, name):
+        key = self.__get_key(user, name)
+        print("keyy: ",key)
         return key
     
-    def lights(self, name):
-        key = 'light_series'
-        # key = self.__get_key(name, self.__gas)
-        # if not self.exists(key):
-        #     self.__database.insert(key, [])
+    def lights(self, user, name):
+        key = self.__get_key(user, name)
+        print("keyy: ",key)
         return key
 
 
     def exists(self, key):
         return self.__database.exists(key)
 
-    def delete(self, key):
+    def delete(self, user, name):
+        key = self.__get_key(user, name)
         if self.exists(key):
             self.__database.delete(key)
             return True
