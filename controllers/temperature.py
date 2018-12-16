@@ -24,7 +24,7 @@ def token_required(f):
             return json_response({'message' : 'Missing token'}, status=401)
 
         try:
-            token = auth[7::]
+            token = auth#[7::]
             print(token)
             data = jwt.decode(token, request.app['JWT_KEY'], algorithms=JWT_ALG)
             print("DAT: ", data)
@@ -42,7 +42,6 @@ def token_required(f):
 @token_required
 async def log_temperatures(request, current_user):
     request_json = await request.json()
-    print(request_json)
     
     try:
         login = request_json['login']
@@ -77,7 +76,6 @@ async def log_temperatures(request, current_user):
 @token_required
 async def delete_temperature_log(request, current_user):
     request_json = await request.json()
-    print(request_json)
     
     try:
         login = request_json['login']

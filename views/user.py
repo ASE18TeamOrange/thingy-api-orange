@@ -6,6 +6,7 @@ from uuid import uuid4
 import asyncio
 from functools import wraps
 import jwt
+import json
 
 JWT_ALG = "HS256"
 
@@ -14,24 +15,21 @@ def token_required(f):
     @wraps(f)
     def decorated(request, *args, **kwargs):
         token = None
-
         try:
             auth = request.headers['authorization']
         except KeyError as keyErr:
-            print(keyErr)
-            return json_response({'message' : 'Missing token'}, status=401)
+            return json_response({'message': 'Missing token'}, status=401)
 
         try:
-            token = auth[7::]
+            token = auth#[7::]
             print(token)
             data = jwt.decode(token, request.app['JWT_KEY'], algorithms=JWT_ALG)
             print("DAT: ", data)
             current_user = data['login']
-            print("User: ", current_user)
         except jwt.ExpiredSignatureError:
-            return Response(text='Signature expired. Please log in again.')
+            return json_response({'message': 'Signature expired. Please log in again.'}, status=401)
         except jwt.InvalidTokenError:
-            return Response(text='Invalid token. Please log in again.')
+            return json_response({'message': 'Invalid token. Please log in again.'}, status=401)
 
         return f(request, current_user, *args, **kwargs)
 
@@ -43,7 +41,6 @@ async def post(request):
     """ Register user with specified login and password """
     
     request_json = await request.json()
-    print(request_json)
 
     try:
         login = request_json['login']
@@ -55,48 +52,46 @@ async def post(request):
     except Exception as e:
         print(e)
 
-    print(login, " ", password)
     try:
         result = await User.create(login, password)
 
         if result is None:
-            return Response(text="Username already exists")
+            return json_response({'message': 'User already exists'}, status=401)
         
-        return Response(text="User created", status=201)
+        return json_response({'message': 'User created!'}, status=200)
     except Exception as ex:
         print("Exception occurred while trying to create user: ", ex)
-        return Response(text="User creation failed", status=500)
+        return json_response({'message': 'User creation failed!'}, status=500)
     
 
 @token_required
 @asyncio.coroutine
 async def delete(request, current_user):
     """ Delete user with specific login """
-    
     request_json = await request.json()
-    print(request_json)
 
     try:
         login = request_json['login']
+        print(login)
     except Exception as e:
         print(e)
         print("Login needed")
 
     if login != current_user:
-        return Response(text="You have no power here!", status=403)
+        print(str(login) + ' - ' + str(current_user))
+        return json_response({'message': 'You have no power here!'}, status=403)
 
     result = await User.delete(login)
 
     if result is None:
-        return Response(text="No user with this login", status=400)
+        return json_response({'message': 'no user with this login!'}, status=400)
     
-    return Response(text="User deleted", status=200)
+    return json_response({'message': 'user deleted'}, status=200)
 
 
 @asyncio.coroutine
 async def login(request):
     request_json = await request.json()
-    print(request_json)
 
     try:
         login = request_json['login']
@@ -113,7 +108,7 @@ async def login(request):
     result = await User.login(login, password, request.app['JWT_KEY'])
 
     if result is None:
-        return Response(text="Login failed. Login or password incorrect")
+        return json_response({'message': 'Login failed. Login or password incorrect!'}, status=401)
     
     return result
     
@@ -121,8 +116,7 @@ async def login(request):
 @token_required
 @asyncio.coroutine
 async def show_profile(request, current_user):
-    print(request)
-
+    print('show_profile')
     try:
         login = request.match_info.get('login')
     except Exception as e:
@@ -130,14 +124,18 @@ async def show_profile(request, current_user):
         print("Login not found")
     
     if login != current_user:
-        return Response(text="You have no power here!", status=403)
+        return json_response({'message': 'You have no power here!'}, status=403)
 
     result = await User.get_profile(login)
 
     if result is None:
-        return Response(text="Profile not found")
-    
-    return json_response(result, status=200)
+        return json_response({'message': 'Profile not found'}, status=401)
+
+    list_of_sensors = result['sensors']
+    sensors = ','.join(list_of_sensors)
+    return json_response(
+        {'login': result['login'], 'id': result['id'], 'thingy': result['thingy'], 'sensors': '[' + sensors + ']'}
+    , status=200)
 
 
 @token_required
@@ -153,19 +151,20 @@ async def logout(request, current_user):
         print("Login not found")
 
     if login != current_user:
-        return Response(text="You have no power here!", status=403)
+        return json_response({'message': 'You have no power here!'}, status=403)
 
     result = await User.logout(login)
     
     if result is None:
-        return Response(text="User already logged out!", status=401)
+        return json_response({'message': 'User already logged out!'}, status=401)
 
-    return Response(text="Logout successful!", status=200)
+    return json_response({'message': 'Logout successful!'}, status=200)
 
 
 @token_required
 @asyncio.coroutine
 async def connect_thingy(request, current_user):
+    print('connect_thingy')
     request_json = await request.json()
     print(request_json)
 
@@ -182,11 +181,11 @@ async def connect_thingy(request, current_user):
         print("Thingy id not found")
 
     if login != current_user:
-        return Response(text="You have no power here!", status=403)
+        return json_response({'message': 'You have no power here!'}, status=403)
 
     result = await User.connect_thingy(login, thingy_id)
     
     if result is None:
-        return Response(text="User not found", status=401)
+        return json_response({'message': 'User not found!'}, status=401)
 
-    return Response(text="Successfully connected!", status=200)
+    return json_response({'message': 'Successfully connected!'}, status=200)

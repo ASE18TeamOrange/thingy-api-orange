@@ -22,10 +22,9 @@ def token_required(f):
             return json_response({'message' : 'Missing token'}, status=401)
 
         try:
-            token = auth[7::]
+            token = auth#[7::]
             print(token)
             data = jwt.decode(token, request.app['JWT_KEY'], algorithms=JWT_ALG)
-            print("AAAA")
             print("DAT: ", data)
             current_user = data['login']
             print("User: ", current_user)
@@ -47,11 +46,9 @@ class TempsView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with all temperature readings """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -59,7 +56,7 @@ class TempsView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
 
-      return json_response(await Temperature.all_readings(current_user))
+      return json_response(await Temperature.all_readings(current_user), status=200)
 
 
 class LastTempView(View, CorsViewMixin):
@@ -70,11 +67,9 @@ class LastTempView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with the current temperature reading """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -82,7 +77,7 @@ class LastTempView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
 
-      return json_response(await Temperature.last_reading(current_user))
+      return json_response(await Temperature.last_reading(current_user), status=200)
 
 
 class PressView(View, CorsViewMixin):
@@ -93,11 +88,9 @@ class PressView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with all pressure readings """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -105,7 +98,7 @@ class PressView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
         
-      return json_response(await Pressure.all_readings(current_user))
+      return json_response(await Pressure.all_readings(current_user), status=200)
 
 class LastPressView(View, CorsViewMixin):
     """
@@ -115,11 +108,9 @@ class LastPressView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with the current pressure reading """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -127,7 +118,7 @@ class LastPressView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
 
-      return json_response(await Pressure.last_reading(current_user))
+      return json_response(await Pressure.last_reading(current_user), status=200)
 
 
 class HumidView(View, CorsViewMixin):
@@ -138,11 +129,9 @@ class HumidView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with all humidity readings """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -150,7 +139,7 @@ class HumidView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
 
-      return json_response(await Humidity.all_readings(current_user))
+      return json_response(await Humidity.all_readings(current_user), status=200)
 
 class LastHumidView(View, CorsViewMixin):
     """
@@ -160,11 +149,9 @@ class LastHumidView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with the current humidity reading """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -172,7 +159,7 @@ class LastHumidView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
 
-      return json_response(await Humidity.last_reading(current_user))
+      return json_response(await Humidity.last_reading(current_user), status=200)
 
 
 class GasView(View, CorsViewMixin):
@@ -183,11 +170,9 @@ class GasView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with all gas readings """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -195,7 +180,7 @@ class GasView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
 
-      return json_response(await Gas.all_readings(current_user))
+      return json_response(await Gas.all_readings(current_user), status=200)
 
 class LastGasView(View, CorsViewMixin):
     """
@@ -205,11 +190,9 @@ class LastGasView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with the current gas reading """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -217,7 +200,7 @@ class LastGasView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
 
-      return json_response(await Gas.last_reading(current_user))
+      return json_response(await Gas.last_reading(current_user), status=200)
 
 
 class LightView(View, CorsViewMixin):
@@ -228,11 +211,9 @@ class LightView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with all light readings """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -240,7 +221,7 @@ class LightView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
 
-      return json_response(await Light.all_readings(current_user))
+      return json_response(await Light.all_readings(current_user), status=200)
 
 class LastLightView(View, CorsViewMixin):
     """
@@ -250,11 +231,9 @@ class LastLightView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with the current light reading """
-      request_json = await self.request.json()
-      print(request_json)
-
+      login = None
       try:
-        login = request_json['login']
+        login = self.request.match_info.get('login')
       except Exception as e:
           print(e)
           print("Login needed")
@@ -262,4 +241,4 @@ class LastLightView(View, CorsViewMixin):
       if login != current_user:
         return Response(text="You have no power here!", status=403)
         
-      return json_response(await Light.last_reading(current_user))
+      return json_response(await Light.last_reading(current_user), status=200)

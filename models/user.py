@@ -49,11 +49,12 @@ class User:
     async def delete(cls, login):
         redis = Database()
         llogin = login.lower()
-
+        print(llogin)
         db_entry = redis.get_hash('users:', llogin)
         print("ed", db_entry)
 
         if db_entry is None:
+            print('none')
             return None
         else:
             user_dict = literal_eval(db_entry.decode('utf-8'))
@@ -69,9 +70,9 @@ class User:
         redis = Database()
         llogin = login.lower()
 
-        if redis.get_hash('sessions:', llogin):
-            print("User with login %s already logged in" % llogin)
-            return None
+        #if redis.get_hash('sessions:', llogin):
+        #    print("User with login %s already logged in" % llogin)
+        #    return None
 
         if redis.key_exists_in_hash('users:', llogin):
             login_entry = redis.get_hash('users:', llogin)
@@ -98,7 +99,7 @@ class User:
 
                 redis.set_hash('sessions:', llogin, content)
 
-                return json_response({"token" : str_token})
+                return json_response({"token" : str_token}, status=200)
         else:
             return None
     
