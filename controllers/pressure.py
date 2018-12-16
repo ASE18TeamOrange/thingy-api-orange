@@ -24,7 +24,7 @@ def token_required(f):
             return json_response({'message' : 'Missing token'}, status=401)
 
         try:
-            token = auth[7::]
+            token = auth#[7::]
             print(token)
             data = jwt.decode(token, request.app['JWT_KEY'], algorithms=JWT_ALG)
             print("DAT: ", data)

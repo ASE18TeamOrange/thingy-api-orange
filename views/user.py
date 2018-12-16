@@ -131,10 +131,10 @@ async def show_profile(request, current_user):
     if result is None:
         return json_response({'message': 'Profile not found'}, status=401)
 
-    list_of_sensors = result['sensors']
-    sensors = ','.join(list_of_sensors)
+    #list_of_sensors = result['sensors']
+    #sensors = ','.join(list_of_sensors)
     return json_response(
-        {'login': result['login'], 'id': result['id'], 'thingy': result['thingy'], 'sensors': '[' + sensors + ']'}
+        {'login': result['login'], 'id': result['id'], 'thingy': result['thingy']} #, 'sensors': '[' + sensors + ']'
     , status=200)
 
 

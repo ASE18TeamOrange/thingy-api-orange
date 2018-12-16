@@ -124,16 +124,11 @@ class User:
             db_entry = redis.get_hash('users:', llogin)
             user_dict = literal_eval(db_entry.decode('utf-8'))
             uuid = user_dict['id']
-            print(uuid)
-            
 
             profile_before = redis.get_hash_all("user:%s"%uuid)
-            print(profile_before)
-            profile = convert(profile_before)
-            profile['sensors'] = literal_eval(profile['sensors'])
-            print("DIC: ", profile)
-            print(type(profile))
 
+            profile = convert(profile_before)
+            #profile['sensors'] = literal_eval(profile['sensors'])
             return profile
         
         return None

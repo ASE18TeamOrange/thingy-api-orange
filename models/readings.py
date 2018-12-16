@@ -68,8 +68,6 @@ class Pressure:
         
         return None
 
-        return reading_json
-
 
 class Humidity:
 # Store humidity readings
@@ -102,8 +100,6 @@ class Humidity:
             return reading_json
         
         return None
-
-        return reading_json
 
 
 class Gas:
@@ -138,8 +134,6 @@ class Gas:
         
         return None
 
-        return reading_json
-
 
 class Light:
 # Store light readings
@@ -172,5 +166,3 @@ class Light:
             return reading_json
         
         return None
-
-        return reading_json
