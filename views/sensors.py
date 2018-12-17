@@ -46,6 +46,7 @@ class TempsView(View, CorsViewMixin):
     @token_required
     async def get(self, current_user):
       """ Return JSON with all temperature readings """
+      print("get temp")
       login = None
       try:
         login = self.request.match_info.get('login')

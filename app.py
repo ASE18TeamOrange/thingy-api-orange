@@ -10,7 +10,8 @@ def app_factory(args=()):
     app['JWT_KEY'] = "65479d4dee2b90587ec0cff62dfb8f042a2adabc6e7ded6f"
     sessionHandler = SessionHandler(app)
     setup_routes(app)
-    web.run_app(app, host='localhost', port='8081')
+    #web.run_app(app, host='localhost', port='8081')
+    web.run_app(app)
 
 # Run the server
 try:
